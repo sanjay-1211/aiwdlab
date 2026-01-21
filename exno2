@@ -1,1 +1,161 @@
+:root {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #1c1c1c;
+  background-color: #f4f7fb;
+  line-height: 1.6;
+}
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #e8f0ff, #f4f7fb 45%);
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: #108ec0b4;
+  color: #fff;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2.25rem;
+}
+
+header p {
+  margin-top: 0.5rem;
+}
+
+.page-grid {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.media-section,
+.form-section {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  flex: 1 1 360px;
+  box-shadow: 0 20px 40px rgba(15, 15, 15, 0.1);
+}
+
+.media-section img,
+.media-section video,
+.media-section audio {
+  width: 100%;
+  border-radius: 0.75rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.media-section h2,
+.form-section h2,
+.contact-section h2 {
+  margin-top: 0;
+}
+
+.form-field {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+label,
+legend {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+select,
+textarea,
+input[type="file"] {
+  border: 1px solid #cdd4db;
+  border-radius: 0.6rem;
+  padding: 0.85rem;
+  transition: 0.3s ease;
+  font-size: 1rem;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+input[type="submit"] {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.95rem;
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0d6efd, #4a8cff);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(13, 110, 253, 0.35);
+}
+
+fieldset {
+  border: 1px solid #cdd4db;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.contact-section {
+  text-align: center;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.contact-section a {
+  color: #0d6efd;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .page-grid {
+    flex-direction: column;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 1.75rem;
+  }
+
+  .media-section,
+  .form-section {
+    padding: 1rem;
+  }
+
+  input[type="submit"] {
+    width: 100%;
+  }
+}
