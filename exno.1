@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Event Registration & Promotion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <header>
+    <h1>Spring Innovation Summit 2025</h1>
+    <p>Explore ideas, engage with creators, and register for an unforgettable experience.</p>
+  </header>
+
+  <section>
+    <img src="https://example.com/event-banner.jpg" alt="Spring Innovation Summit Banner">
+    <h2>Event Showcase</h2>
+    <p>Watch the promotional teaser and listen to the keynote ambience to get inspired.</p>
+    <video controls poster="https://example.com/video-poster.jpg">
+      <source src="https://example.com/promo-video.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <audio controls>
+      <source src="https://example.com/intro-audio.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </section>
+
+  <section>
+    <h2>Register for the Event</h2>
+    <form action="/submit-registration" method="post" enctype="multipart/form-data">
+      <div>
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Jane Doe" required>
+      </div>
+      <div>
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+      </div>
+      <div>
+        <label for="date">Preferred Attendance Date</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+      <div>
+        <p>Attendance Type</p>
+        <label><input type="radio" name="attendance" value="onsite" checked> Onsite</label>
+        <label><input type="radio" name="attendance" value="virtual"> Virtual</label>
+      </div>
+      <div>
+        <label for="track">Choose a Track</label>
+        <select id="track" name="track" required>
+          <option value="">Select a track</option>
+          <option value="innovation">Innovation Labs</option>
+          <option value="design">Design Thinking</option>
+          <option value="tech">Future Tech</option>
+        </select>
+      </div>
+      <div>
+        <label for="message">Tell Us About Your Goals</label>
+        <textarea id="message" name="message" rows="4" placeholder="Share what you hope to gain from the summit." required></textarea>
+      </div>
+      <div>
+        <label for="portfolio">Upload Supporting Document</label>
+        <input type="file" id="portfolio" name="portfolio" accept=".pdf,.doc,.docx" required>
+      </div>
+      <div>
+        <input type="submit" value="Submit Registration">
+      </div>
+    </form>
+  </section>
+
+  <section>
+    <h2>Contact Support</h2>
+    <p>Phone: 9123569077</p>
+    <p>Email: <a href="mailto:ssanjay23@karunya.edu.in">ssanjay23@karunya.edu.in</a></p>
+  </section>
+</body>
+</html>
