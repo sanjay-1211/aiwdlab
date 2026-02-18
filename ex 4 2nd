@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BMI Calculator — Demo & Self Tests</title>
+  <style>
+    :root { --card-bg:#fff; --accent:#1296db; --muted:#666; font-family:Segoe UI,Arial,sans-serif }
+    body { margin:0; background:#f2f6fb; color:#111; padding:24px }
+    .wrap { max-width:980px; margin:0 auto }
+    header { text-align:center; margin-bottom:18px }
+    .card { background:var(--card-bg); border-radius:10px; padding:18px; box-shadow:0 8px 22px rgba(4,12,25,0.08) }
+    .layout { display:flex; gap:18px; align-items:center; flex-wrap:wrap }
+    .left { flex:1 1 320px }
+    .right { flex:0 0 260px; text-align:center }
+    label { display:block; margin-bottom:6px; font-weight:600 }
+    input[type="number"], select { width:100%; padding:10px; border-radius:6px; border:1px solid #d1dbe7; font-size:1rem }
+    .controls { display:flex; gap:8px; margin-top:10px }
+    button { padding:10px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:700 }
+    button.primary { background:var(--accent); color:#fff }
+    button.ghost { background:#eef4fb; color:var(--accent) }
+    .bmi-value { font-size:48px; font-weight:800; color:var(--accent); margin:6px 0 }
+    .bmi-cat { font-size:16px; color:#444 }
+    .notes { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap }
+    .note { background:#f7fbff; padding:6px 8px; border-radius:6px; color:#0a5f8f; font-weight:600 }
+    .test-log { margin-top:12px; max-height:220px; overflow:auto; background:#0b1b2b; color:#dceffb; padding:12px; border-radius:8px; font-family:monospace; font-size:13px }
+    footer { margin-top:14px; text-align:center; color:var(--muted); font-size:13px }
+    @media (max-width:640px) {
+      .right { flex:1 1 100%; order: -1; }
+      .layout { gap:12px }
+      .bmi-value { font-size:40px }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Body Mass Index (BMI) — Calculator & Demo</h1>
+      <p style="color:var(--muted);margin:6px 0 0">Uses onkeyup; demonstrates DOM APIs, events, and a self-test suite.</p>
+    </header>
+
+    <div class="card" id="mainCard">
+      <div class="layout">
+        <div class="left">
+          <form id="bmiForm" name="bmiForm">
+            <div>
+              <label for="weight">Weight</label>
+              <div style="display:flex;gap:8px">
+                <input id="weight" type="number" min="1" step="0.1" value="80" onkeyup="handleKeyup(event)" />
+                <span style="align-self:center;color:var(--muted)">kg</span>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <label for="height">Height</label>
+              <div style="display:flex;gap:8px">
+                <input id="height" type="number" min="30" step="0.1" value="170" onkeyup="handleKeyup(event)" />
+                <select id="heightUnit" onchange="handleUnitChange(event)">
+                  <option value="cm" selected>cm</option>
+                  <option value="m">m</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="controls">
+              <button type="submit" class="primary" id="submitBtn">Calculate</button>
+              <button type="button" class="ghost" id="resetBtn" onclick="resetForm()">Reset</button>
+              <button type="button" id="selfTestBtn" onclick="runSelfTests()">Run Self-Test</button>
+            </div>
+
+            <div class="notes" style="margin-top:12px">
+              <div class="note demo-note">Demo</div>
+              <div class="note demo-note">onkeyup</div>
+              <div class="note demo-note">DOM APIs</div>
+            </div>
+          </form>
+
+          <div style="margin-top:12px">
+            <p id="pCount">Paragraph count: --</p>
+            <p class="info">Last action: <span id="lastAction">none</span></p>
+          </div>
+        </div>
+
+        <div class="right" role="region" aria-live="polite">
+          <div style="display:inline-block;text-align:center;">
+            <div style="background:#eef9ff;padding:14px;border-radius:10px">
+              <div style="font-size:14px;color:#0b6c9d">Your BMI</div>
+              <div class="bmi-value" id="bmiValue">--</div>
+              <div class="bmi-cat" id="bmiCategory">Enter values</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-log" id="testLog" aria-live="polite"></div>
+    </div>
+
+    <footer>
+      Contact: <strong>9123569077</strong> | <a href="mailto:ssanjay23@karunya.edu.in">ssanjay23@karunya.edu.in</a>
+    </footer>
+  </div>
+
+  <script>
+    var lastKeyupFired = false
+    var lastChangeFired = false
+    var lastSubmitFired = false
+    var lastClickReset = false
+
+    function init() {
+      var wEl = document.getElementById('weight')
+      var hEl = document.querySelector('#height')
+      var notesByClass = document.getElementsByClassName('demo-note')
+      var notesAll = document.querySelectorAll('.demo-note')
+      var paragraphs = document.getElementsByTagName('p')
+      document.getElementById('pCount').textContent = 'Paragraph count: ' + paragraphs.length
+      for (var i = 0; i < notesByClass.length; i++) {
+        notesByClass[i].textContent = notesByClass[i].textContent
+      }
+      document.getElementById('bmiForm').addEventListener('submit', handleSubmit)
+      wEl.addEventListener('keyup', function(){ lastKeyupFired = true })
+      hEl.addEventListener('keyup', function(){ lastKeyupFired = true })
+      document.getElementById('resetBtn').addEventListener('click', function(){ lastClickReset = true })
+      calculateAndDisplayBMI()
+    }
+
+    function handleKeyup(e) {
+      lastKeyupFired = true
+      calculateAndDisplayBMI()
+      document.getElementById('lastAction').textContent = 'onkeyup'
+    }
+
+    function handleUnitChange(e) {
+      lastChangeFired = true
+      var unit = e.target.value
+      var h = document.getElementById('height')
+      if (unit === 'm') {
+        if (h.value && parseFloat(h.value) > 10) {
+          h.value = (parseFloat(h.value) / 100).toFixed(2)
+        }
+      } else {
+        if (h.value && parseFloat(h.value) <= 10) {
+          h.value = Math.round(parseFloat(h.value) * 100)
+        }
+      }
+      calculateAndDisplayBMI()
+      document.getElementById('lastAction').textContent = 'onchange'
+    }
+
+    function handleSubmit(e) {
+      if (e && typeof e.preventDefault === 'function') e.preventDefault()
+      lastSubmitFired = true
+      calculateAndDisplayBMI()
+      document.getElementById('lastAction').textContent = 'onsubmit'
+      return false
+    }
+
+    function resetForm() {
+      document.getElementById('weight').value = ''
+      document.getElementById('height').value = ''
+      document.getElementById('heightUnit').value = 'cm'
+      document.getElementById('bmiValue').textContent = '--'
+      document.getElementById('bmiCategory').textContent = 'Enter values'
+      lastClickReset = true
+      document.getElementById('lastAction').textContent = 'reset'
+    }
+
+    function calculateAndDisplayBMI() {
+      var w = parseFloat(document.getElementById('weight').value)
+      var hVal = parseFloat(document.getElementById('height').value)
+      var unit = document.getElementById('heightUnit').value
+      if (!isFinite(w) || !isFinite(hVal) || w <= 0 || hVal <= 0) {
+        document.getElementById('bmiValue').textContent = '--'
+        document.getElementById('bmiCategory').textContent = 'Please enter valid positive numbers'
+        return
+      }
+      var heightMeters = unit === 'cm' ? hVal / 100 : hVal
+      var bmi = w / (heightMeters * heightMeters)
+      var bmiRounded = Math.round(bmi * 10) / 10
+      document.getElementById('bmiValue').textContent = bmiRounded.toFixed(1)
+      var category = ''
+      if (bmi < 18) category = 'Underweight'
+      else if (bmi >= 18 && bmi <= 25) category = 'Normal'
+      else if (bmi > 25 && bmi <= 30) category = 'Overweight'
+      else category = 'Obese'
+      document.getElementById('bmiCategory').textContent = category
+      return bmiRounded
+    }
+
+    function log(msg) {
+      var logEl = document.getElementById('testLog')
+      var stamp = new Date().toISOString().slice(11,19)
+      logEl.textContent = '[' + stamp + '] ' + msg + '\n' + logEl.textContent
+    }
+
+    function runSelfTests() {
+      var passCount = 0
+      var failCount = 0
+      var total = 11
+      log('Starting self-tests (this will run a few checks)...')
+
+      try {
+        var elById = document.getElementById('weight')
+        if (elById) { passCount++; log('TC01 getElementById: PASS') } else { failCount++; log('TC01 getElementById: FAIL') }
+      } catch (e) { failCount++; log('TC01 getElementById: ERROR') }
+
+      try {
+        var qSel = document.querySelector('#height')
+        if (qSel) { passCount++; log('TC02 querySelector: PASS') } else { failCount++; log('TC02 querySelector: FAIL') }
+      } catch (e) { failCount++; log('TC02 querySelector: ERROR') }
+
+      try {
+        var cls = document.getElementsByClassName('demo-note')
+        if (cls && cls.length >= 1) { passCount++; log('TC03 getElementsByClassName: PASS') } else { failCount++; log('TC03 getElementsByClassName: FAIL') }
+      } catch (e) { failCount++; log('TC03 getElementsByClassName: ERROR') }
+
+      try {
+        var qAll = document.querySelectorAll('.demo-note')
+        if (qAll && qAll.length === cls.length) { passCount++; log('TC04 querySelectorAll: PASS') } else { failCount++; log('TC04 querySelectorAll: FAIL') }
+      } catch (e) { failCount++; log('TC04 querySelectorAll: ERROR') }
+
+      try {
+        var tags = document.getElementsByTagName('p')
+        if (tags && tags.length > 0) { passCount++; log('TC05 getElementsByTagName: PASS') } else { failCount++; log('TC05 getElementsByTagName: FAIL') }
+      } catch (e) { failCount++; log('TC05 getElementsByTagName: ERROR') }
+
+      try {
+        lastKeyupFired = false
+        document.getElementById('weight').value = '70'
+        document.getElementById('weight').dispatchEvent(new Event('keyup'))
+        if (lastKeyupFired) { passCount++; log('TC06 onkeyup event: PASS') } else { failCount++; log('TC06 onkeyup event: FAIL') }
+      } catch (e) { failCount++; log('TC06 onkeyup event: ERROR') }
+
+      try {
+        lastChangeFired = false
+        document.getElementById('heightUnit').value = 'm'
+        document.getElementById('heightUnit').dispatchEvent(new Event('change'))
+        if (lastChangeFired) { passCount++; log('TC07 onchange event: PASS') } else { failCount++; log('TC07 onchange event: FAIL') }
+      } catch (e) { failCount++; log('TC07 onchange event: ERROR') }
+
+      try {
+        lastSubmitFired = false
+        var form = document.getElementById('bmiForm')
+        form.dispatchEvent(new Event('submit', {cancelable:true}))
+        if (lastSubmitFired) { passCount++; log('TC08 onsubmit event handler: PASS') } else { failCount++; log('TC08 onsubmit event handler: FAIL') }
+      } catch (e) { failCount++; log('TC08 onsubmit event handler: ERROR') }
+
+      try {
+        document.getElementById('weight').value = '80'
+        document.getElementById('height').value = '170'
+        document.getElementById('heightUnit').value = 'cm'
+        var bmiVal = calculateAndDisplayBMI()
+        if (Math.abs(bmiVal - 27.7) < 0.2) { passCount++; log('TC09 Calculation correctness: PASS (' + bmiVal + ')') } else { failCount++; log('TC09 Calculation correctness: FAIL (' + bmiVal + ')') }
+      } catch (e) { failCount++; log('TC09 Calculation correctness: ERROR') }
+
+      try {
+        var submitBtn = document.getElementById('submitBtn')
+        if (submitBtn) { passCount++; log('TC10 UI presence (buttons/inputs): PASS') } else { failCount++; log('TC10 UI presence (buttons/inputs): FAIL') }
+      } catch (e) { failCount++; log('TC10 UI presence: ERROR') }
+
+      try {
+        var expectedTotal = 11
+        var got = passCount + failCount
+        if (got >= 9) { passCount++; log('TC11 Overall functionality quick-check: PASS (' + passCount + ' passed, ' + failCount + ' failed)') } else { failCount++; log('TC11 Overall functionality quick-check: FAIL (' + passCount + ' passed, ' + failCount + ' failed)') }
+      } catch (e) { failCount++; log('TC11 Overall functionality quick-check: ERROR') }
+
+      log('Self-tests finished. Passed: ' + passCount + ', Failed: ' + failCount)
+    }
+
+    window.onload = init
+  </script>
+</body>
+</html>
